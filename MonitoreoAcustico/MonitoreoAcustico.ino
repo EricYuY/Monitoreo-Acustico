@@ -211,6 +211,7 @@ void task2(void* parameter) {
       
     */
 
+    //Extracción de octavas
     for (int i = 2; i < (SAMPLES/2); i++){
       if (vReal[i] > 2000) { 
         if (i<=2 )             octave[0] = max(octave[0], (int)(vReal[i])); // 125Hz
@@ -233,18 +234,6 @@ void task2(void* parameter) {
       flag2=1; //Señala al envío de datos
     }
     
-  }
-  vTaskDelete(NULL);
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////// DataBase (TASK 3) ////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-void task3(void* parameter) {
-
-  while (true) {
-    vTaskDelay(100/portTICK_PERIOD_MS);
   }
   vTaskDelete(NULL);
 }
@@ -364,9 +353,9 @@ void setup() {
       if (flag2==1){ //Una vez terminado la identificación de Octave, LA10, LA90 y LAeq --> enviar
 
         //Enviando datos a DB
-        //network->firestoreDataUpdate(1,Leq_dB,LAeq,LA10,LA90,octave,ntpHora);
-        //Serial.print("Firestore Database UPDATED  - Parámetros // ");
-        //Serial.println(ntpHora);
+        network->firestoreDataUpdate(1,Leq_dB,LAeq,LA10,LA90,octave,ntpHora);
+        Serial.print("Firestore Database UPDATED  - Parámetros // ");
+        Serial.println(ntpHora);
         flag2=0;    
       }
 
@@ -379,14 +368,15 @@ void setup() {
       time_now=millis();
       if(((time_now-time_start)>SEND_TIME)){
         time_start=time_now;
-        //getHoraNTP(ntpHora);
+        getHoraNTP(ntpHora);
         flag=1;
       }else if((time_now-time_start2)>(SEND_TIME/2)){  //SEND_TIME/60 c 1min
         time_start2=time_now;
-        //getHoraNTP(ntpHora);
-        //network->firestoreDataUpdate(0,Leq_dB,LAeq,LA10,LA90,octave,ntpHora);
-        //Serial.print("Firestore Database UPDATED  - SPL // ");
-        //Serial.println(ntpHora);
+        
+        getHoraNTP(ntpHora);
+        network->firestoreDataUpdate(0,Leq_dB,LAeq,LA10,LA90,octave,ntpHora);
+        Serial.print("Firestore Database UPDATED  - SPL // ");
+        Serial.println(ntpHora);
       }
     }
   }
